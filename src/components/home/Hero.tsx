@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export function Hero() {
   return (
@@ -12,7 +13,9 @@ export function Hero() {
             Experience unparalleled luxury and comfort at Lodgewell. A perfect blend of modern amenities and timeless elegance, designed for your ultimate relaxation.
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
-            <Button size="lg">Explore Rooms</Button>
+            <Button size="lg" asChild>
+              <Link href="/rooms">Explore Rooms</Link>
+            </Button>
             <Button size="lg" variant="outline">Learn More</Button>
           </div>
         </div>
