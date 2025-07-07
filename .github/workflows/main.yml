@@ -1,52 +1,36 @@
 name: TypeScript CI/CD Pipeline
 
-on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+on: [push, pull_request]
 
 jobs:
-  # Continuous Integration (CI) - Build & Test
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      # 1. Checkout code
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # 2. Setup Node.js (TypeScript requires Node)
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20"  # Recommended for TypeScript
-          cache: "npm"  # Caches node_modules for faster builds
+          node-version: "20"
 
-      # 3. Install dependencies
       - name: Install dependencies
-        run: npm ci  # Clean install (faster than 'npm install')
+        run: npm ci
 
-      # 4. Build TypeScript (transpiles to JavaScript)
       - name: Build project
-        run: npm run build  # Runs "tsc" (TypeScript compiler)
+        run: npm run build
 
-      # 5. Run tests (assuming you have Jest/Mocha)
       - name: Run tests
         run: npm test
 
-  # Continuous Deployment (CD) - Deploy to Vercel (example)
   deploy:
-    needs: build-and-test  # Only deploy if CI passes
+    needs: build-and-test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'  # Only deploy from 'main' branch
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
-
-      # Deploy to Vercel (replace with your preferred platform)
+      
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
       - name: Deploy to Vercel
         run: vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}  # Store this in GitHub Secrets
