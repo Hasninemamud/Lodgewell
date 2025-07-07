@@ -1,0 +1,48 @@
+name: CICD Pipline
+
+# When to run this workflow (on push or PR to main branch)
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+# Jobs to execute
+jobs:
+  test:  # Job ID (can be any name)
+    runs-on: ubuntu-latest  # Runs on a GitHub-hosted Ubuntu machine
+
+    steps:  # List of steps to execute
+      # Step 1: Check out the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4  # Official GitHub action to fetch code
+
+      # Step 2: Set up Node.js (using a pre-built action)
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"  # Specifies Node.js version
+
+      # Step 3: Install dependencies (npm ci is faster than npm install)
+      - name: Install dependencies
+        run: npm ci  # "ci" is optimized for CI environments
+
+      # Step 4: Run tests
+      - name: Run tests
+        run: npm test  # Executes test script from package.json
+ # Then, deploy if tests pass
+  deploy:
+    needs: test  # Waits for the "test" job to succeed first
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Step 1: Install Vercel CLI
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      # Step 2: Deploy to Vercel (requires Vercel token)
+      - name: Deploy to Vercel
+        run: vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}  # Stored in GitHub Secrets        
