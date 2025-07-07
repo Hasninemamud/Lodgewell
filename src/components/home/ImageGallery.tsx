@@ -14,6 +14,7 @@ const galleryImages = [
   { src: "https://placehold.co/800x600.png", alt: "Outdoor swimming pool surrounded by lounge chairs and palm trees", hint: "swimming pool" },
   { src: "https://placehold.co/800x600.png", alt: "Fine dining restaurant within the hotel with ambient lighting", hint: "hotel restaurant" },
   { src: "https://placehold.co/800x600.png", alt: "Hotel exterior at dusk with beautiful lighting", hint: "hotel exterior" },
+  { src: "https://placehold.co/800x600.png", alt: "Serene hotel spa with massage tables", hint: "hotel spa" },
 ];
 
 export function ImageGallery() {
