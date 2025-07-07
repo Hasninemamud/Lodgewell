@@ -1,48 +1,52 @@
-name: CICD Pipline
+name: TypeScript CI/CD Pipeline
 
-# When to run this workflow (on push or PR to main branch)
 on:
   push:
     branches: ["main"]
   pull_request:
     branches: ["main"]
 
-# Jobs to execute
 jobs:
-  test:  # Job ID (can be any name)
-    runs-on: ubuntu-latest  # Runs on a GitHub-hosted Ubuntu machine
+  # Continuous Integration (CI) - Build & Test
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    steps:  # List of steps to execute
-      # Step 1: Check out the repository code
-      - name: Checkout code
-        uses: actions/checkout@v4  # Official GitHub action to fetch code
-
-      # Step 2: Set up Node.js (using a pre-built action)
+      # 2. Setup Node.js (TypeScript requires Node)
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18"  # Specifies Node.js version
+          node-version: "20"  # Recommended for TypeScript
+          cache: "npm"  # Caches node_modules for faster builds
 
-      # Step 3: Install dependencies (npm ci is faster than npm install)
+      # 3. Install dependencies
       - name: Install dependencies
-        run: npm ci  # "ci" is optimized for CI environments
+        run: npm ci  # Clean install (faster than 'npm install')
 
-      # Step 4: Run tests
+      # 4. Build TypeScript (transpiles to JavaScript)
+      - name: Build project
+        run: npm run build  # Runs "tsc" (TypeScript compiler)
+
+      # 5. Run tests (assuming you have Jest/Mocha)
       - name: Run tests
-        run: npm test  # Executes test script from package.json
- # Then, deploy if tests pass
+        run: npm test
+
+  # Continuous Deployment (CD) - Deploy to Vercel (example)
   deploy:
-    needs: test  # Waits for the "test" job to succeed first
+    needs: build-and-test  # Only deploy if CI passes
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'  # Only deploy from 'main' branch
     steps:
       - uses: actions/checkout@v4
 
-      # Step 1: Install Vercel CLI
+      # Deploy to Vercel (replace with your preferred platform)
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
-      # Step 2: Deploy to Vercel (requires Vercel token)
       - name: Deploy to Vercel
         run: vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}  # Stored in GitHub Secrets        
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}  # Store this in GitHub Secrets
